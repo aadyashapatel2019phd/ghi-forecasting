@@ -1,0 +1,106 @@
+# GHI Forecasting Configuration
+# This file contains the default configuration for the seasonal GHI forecasting system
+
+data:
+  required_columns:
+    - "T norm"
+    - "CDHI norm" 
+    - "CDNI norm"
+    - "CGHI norm"
+    - "DHI norm"
+    - "DNI norm"
+    - "RH norm"
+    - "SZA norm"
+    - "GHI norm"
+  
+  input_features:
+    - "T norm"
+    - "CDHI norm"
+    - "CDNI norm" 
+    - "CGHI norm"
+    - "DHI norm"
+    - "DNI norm"
+    - "RH norm"
+    - "SZA norm"
+  
+  target_column: "GHI norm"
+  test_size: 0.2
+  random_state: 42
+
+models:
+  ELR:
+    name: "Efficient Linear Regression"
+    default_params:
+      learner: "least_squares"
+      regularization: "ridge"
+      lambda: 0.09694
+      beta_tolerance: 0.0001
+      standardize: false
+    
+    optimization_ranges:
+      lambda:
+        min: 2.7902e-9
+        max: 27.9018
+        log: true
+      learner: ["least_squares", "svm"]
+      regularization: ["ridge", "lasso"]
+      standardize: [true, false]
+
+  RT:
+    name: "Regression Trees"
+    default_params:
+      min_samples_leaf: 3
+      standardize: false
+    
+    optimization_ranges:
+      min_samples_leaf:
+        min: 1
+        max: 1792
+      standardize: [true, false]
+
+  GPR:
+    name: "Gaussian Process Regression"
+    default_params:
+      basis_function: "linear"
+      kernel_function: "Isotropic Matern 5/2"
+      kernel_scale: 5.9895
+      sigma: 0.00010961
+      standardize: false
+    
+    optimization_ranges:
+      basis_function: ["constant", "zero", "linear"]
+      kernel_function:
+        - "Nonisotropic Exponential"
+        - "Nonisotropic Matern 3/2"
+        - "Nonisotropic Matern 5/2"
+        - "Nonisotropic Rational Quadratic"
+        - "Nonisotropic Squared Exponential"
+        - "Isotropic Exponential"
+        - "Isotropic Matern 3/2"
+        - "Isotropic Matern 5/2"
+        - "Isotropic Rational Quadratic"
+        - "Isotropic Squared Exponential"
+      kernel_scale:
+        min: 0.0001
+        max: 1000
+        log: true
+      sigma:
+        min: 0.0001
+        max: 2.665
+        log: true
+      standardize: [true, false]
+
+optimization:
+  n_trials: 60
+  cv_folds: 5
+  scoring: "neg_mean_squared_error"
+  n_jobs: -1
+
+evaluation:
+  metrics: ["rmse", "mae", "r2", "mape"]
+  plot_formats: ["png"]
+  plot_dpi: 300
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
